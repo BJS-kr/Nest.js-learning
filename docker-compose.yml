@@ -4,24 +4,20 @@ services:
   postgres:
     image: postgres
     environment:
-      POSTGRES_PASSWORD: test
-      POSTGRES_USER: test
-      POSTGRES_DB: test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: db
       TZ: Asia/Seoul
     env_file:
       - .env
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-    ports:
-      - '3001:5432'
   redis:
     image: redis
     command: redis-server --port 6379
     hostname: redis_test
     environment:
       TZ: Asia/Seoul
-    ports: 
-      - '3002:6379'
   app:
     build: .
     depends_on: 

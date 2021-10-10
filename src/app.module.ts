@@ -1,27 +1,33 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Movie } from 'movie/entities/movie.entity';
-import { MovieModule } from 'movie/movie.module';
+import { Movie } from 'src/movie/entities/movie.entity';
+import { MovieModule } from 'src/movie/movie.module';
+import * as redisStore from 'cache-manager-redis-store'
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
     type: 'postgres',
-    host: '0.0.0.0',
-    port: 3001,
-    username: 'test',
-    password: 'test',
-    database: 'test',
+    host: 'postgres',
+    port: 5432,
+    username: 'user',
+    password: 'password',
+    database: 'db',
     entities: [Movie],
-    retryAttempts: 10,
+    retryAttempts: 3,
     retryDelay: 3000,
     autoLoadEntities: false,
     keepConnectionAlive: false,
     extra: {
       connectionLimit:5
     }
+  }),
+  CacheModule.register({
+    store: redisStore,
+    host: 'redis',
+    port: 6379
   }), MovieModule],
   controllers: [AppController],
   providers: [AppService],
