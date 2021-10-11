@@ -27,5 +27,4 @@ services:
       - '3000:3000'
     volumes:
       - '.:/src/app'
-      - '/src/app/node_modules'
-  
+      - '/c/Users/BJS/Desktop/projects/js-s-nestjs/node_modules'
