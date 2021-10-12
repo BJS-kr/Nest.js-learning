@@ -30,27 +30,6 @@ export class MovieService {
     }
   }
 
-  public async addMovie(movie: CreateMovieDto) {
-    const QR: QueryRunner = this.connection.createQueryRunner();
-    const {
-      connect,
-      startTransaction: start,
-      manager: { save },
-      commitTransaction: commit,
-      rollbackTransaction: rollback,
-      release,
-    } = QR;
-    await connect();
-    await start();
-    try {
-      await save(movie);
-      await commit();
-    } catch (e) {
-      await rollback();
-    } finally {
-      await release();
-    }
-  }
   set() {
     return this.cacheManager.set('bjs', 'jj');
   }

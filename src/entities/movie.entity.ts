@@ -7,9 +7,9 @@ export class Movie {
   id: number;
   @Column('varchar', { length: 40 })
   title: string;
-  @Column('varchar', { length: 100 })
+  @Column('varchar', { length: 100, nullable: true })
   desc: string;
-  @Column('varchar', { length: 20 })
+  @Column('varchar', { length: 20, nullable: true })
   name: string;
   @Column('int', { default: 0 })
   like: number;

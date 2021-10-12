@@ -1,7 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
 import { Movie } from './movie.entity';
 
 @Entity()
+@Unique(['userId'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
