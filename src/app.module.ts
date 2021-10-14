@@ -7,6 +7,8 @@ import { MovieModule } from 'src/movie/movie.module';
 import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-redis-store';
 import { User } from './entities/user.entity';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -37,6 +39,9 @@ import { User } from './entities/user.entity';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
+  ],
 })
 export class AppModule {}
