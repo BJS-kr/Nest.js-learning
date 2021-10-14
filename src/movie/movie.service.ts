@@ -1,26 +1,23 @@
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cache } from 'cache-manager';
-import Redis from 'ioredis';
 import { Connection, getConnection, QueryRunner } from 'typeorm';
 import { Movie } from '../entities/movie.entity';
 import { MovieRepository } from './movie.repository';
-
-const redis = new Redis({ host: 'redis' });
+import { Redis } from 'ioredis';
 @Injectable()
 export class MovieService {
   constructor(
     @InjectRepository(Movie)
     private movieRepository: MovieRepository,
-    @Inject(CACHE_MANAGER)
-    private cacheManager: Cache,
+    @Inject('REDIS')
+    private redis: Redis,
     private connection: Connection = getConnection(),
   ) {}
   public async AddMovie(movie) {
     const movie_ = new Movie();
     Object.assign(movie_, movie);
     this.movieRepository.create(movie_);
-    const QR = this.connection.createQueryRunner();
+    const QR: QueryRunner = this.connection.createQueryRunner();
     await QR.connect();
     await QR.startTransaction();
     try {
@@ -35,18 +32,12 @@ export class MovieService {
     }
   }
   like() {
-    return redis.zadd('movies', 'INCR', 1, '권오빈 일대기');
+    return this.redis.zadd('movies', 'INCR', 1, '변정섭 일대기');
   }
   set() {
-    return this.cacheManager.set('bjs', 'jj');
+    return this.redis.set('bjs', 'jj');
   }
   getLike() {
-    try {
-      return redis.zrange('movies', 0, 0, 'WITHSCORES');
-    } catch (e) {
-      console.log(e);
-    }
-
-    // return this.cacheManager.get('bjs');
+    return this.redis.zrange('movies', 0, 0, 'WITHSCORES');
   }
 }

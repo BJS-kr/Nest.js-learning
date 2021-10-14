@@ -9,10 +9,15 @@ import {
 import { Observable, of } from 'rxjs';
 import { Cache } from 'cache-manager';
 import { Request, Response } from 'express';
+import { Redis } from 'ioredis';
+import IORedis from 'ioredis';
 
 @Injectable()
-export class CacheInterceptor implements NestInterceptor {
-  constructor(@Inject(CACHE_MANAGER) private cashManager: Cache) {}
+export class MovieCacheInterceptor implements NestInterceptor {
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private cashManager: Redis = new IORedis({ host: 'redis' }),
+  ) {}
   async intercept(
     context: ExecutionContext,
     next: CallHandler,

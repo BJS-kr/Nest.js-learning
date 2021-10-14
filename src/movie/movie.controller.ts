@@ -15,6 +15,7 @@ import { MovieGuard } from 'src/guards/movie.guard';
 import { MovieService } from './movie.service';
 import { ErrorInterceptor } from 'src/interceptors/error.interceptor';
 import { CreateMovieDto } from './dto/movie.dto';
+import { MovieCacheInterceptor } from 'src/interceptors/cache.interceptor';
 
 @Controller('movie')
 // @UseGuards(MovieGuard)
@@ -34,6 +35,7 @@ export class MovieController {
     return this.movieService.AddMovie(body);
   }
   @Get(':movieId') // 이미 validation pipe에서 implicit하게 conversion을 수행중이지만, 이와 같이 explicit하게 conversion을 수행 할 수도 있다.
+  @UseInterceptors(MovieCacheInterceptor)
   // every path parameter and query parameter comes over the network as a string by default (nestjs validation)
   // 그래서 ParseStringPipe는 없다. string을 변환하는 pipe밖에 없음
   findOneMovie(@Param('movieId', ParseIntPipe) id: number) {
