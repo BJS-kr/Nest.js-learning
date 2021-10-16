@@ -1,17 +1,17 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { verify } from 'jsonwebtoken';
 import { Observable } from 'rxjs';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 @Injectable()
 export class MovieGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const req = context.switchToHttp().getRequest<Request>();
+    const ctx = context.switchToHttp();
+    const req = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
     try {
-      console.log(req.cookies);
-      console.log(req.headers);
-      verify(req.cookies.accessToken, 'test');
+      res.locals.id = verify(req.cookies.accessToken, 'test')['id'];
       return true;
     } catch (e) {
       return false;

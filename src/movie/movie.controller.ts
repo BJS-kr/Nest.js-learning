@@ -4,7 +4,9 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
+  Res,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -16,9 +18,11 @@ import { MovieService } from './movie.service';
 import { ErrorInterceptor } from 'src/interceptors/error.interceptor';
 import { CreateMovieDto } from './dto/movie.dto';
 import { MovieCacheInterceptor } from 'src/interceptors/cache.interceptor';
+import { Response } from 'express';
+import { UpdateMovieDto } from './dto/update.movie.dto';
 
 @Controller('movie')
-// @UseGuards(MovieGuard)
+@UseGuards(MovieGuard)
 @UsePipes(
   new ValidationPipe({
     // global scope로 설정할 수도 있다.
@@ -30,24 +34,33 @@ import { MovieCacheInterceptor } from 'src/interceptors/cache.interceptor';
 @UseInterceptors(MovieInterceptor)
 export class MovieController {
   constructor(private movieService: MovieService) {}
+  // 영화 등록
   @Post()
-  insertMovie(@Body() body) {
-    return this.movieService.AddMovie(body);
+  addMovie(@Body() body: CreateMovieDto, @Res() res: Response) {
+    res.send({
+      result: this.movieService.addMovie(body, { id: res.locals.id }),
+    });
   }
+  // 영화 한개 정보
   @Get(':movieId') // 이미 validation pipe에서 implicit하게 conversion을 수행중이지만, 이와 같이 explicit하게 conversion을 수행 할 수도 있다.
   @UseInterceptors(MovieCacheInterceptor)
   // every path parameter and query parameter comes over the network as a string by default (nestjs validation)
   // 그래서 ParseStringPipe는 없다. string을 변환하는 pipe밖에 없음
-  findOneMovie(@Param('movieId', ParseIntPipe) id: number) {
-    return typeof id;
+  getOne(@Param('movieId', ParseIntPipe) movieId: number) {
+    return this.movieService.getOne(movieId);
   }
-  @Get()
-  like() {
-    return this.movieService.like();
+  // 영화 수정
+  @Patch(':movieId')
+  patchMovie(
+    @Param('movieId', ParseIntPipe) movieId: number,
+    @Body() movie: UpdateMovieDto,
+  ) {
+    return this.movieService.patchMovie(movieId, movie);
   }
-  @Get('test/test')
-  @UseInterceptors(ErrorInterceptor)
-  getLike() {
-    return this.movieService.getLike();
+
+  // 좋아요
+  @Get('like/:movieId')
+  like(@Param('movieId', ParseIntPipe) movieId: number) {
+    return this.movieService.like(movieId);
   }
 }

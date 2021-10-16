@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsNumber,
-  MinLength,
-  MaxLength,
-} from 'class-validator';
+import { IsString, IsOptional, MinLength, MaxLength } from 'class-validator';
 
 export class CreateMovieDto {
   @IsString()
@@ -16,6 +10,4 @@ export class CreateMovieDto {
   @IsOptional()
   @IsString({ each: true })
   readonly name: string[];
-  @IsNumber()
-  readonly user: number;
 }

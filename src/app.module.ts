@@ -9,6 +9,8 @@ import * as redisStore from 'cache-manager-redis-store';
 import { User } from './entities/user.entity';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
+import { MoviesTable } from './migrations/movies.table';
+import { UsersTable } from './migrations/users.table';
 
 @Module({
   imports: [
@@ -23,10 +25,15 @@ import { AllExceptionsFilter } from './filters/all-exceptions.filter';
       retryAttempts: 3,
       retryDelay: 3000,
       autoLoadEntities: false,
-      keepConnectionAlive: false,
+      keepConnectionAlive: true, //hot reload기능을 사용하기 위해
+      synchronize: true,
       extra: {
         connectionLimit: 5,
       },
+      logging: true,
+      // migrations: ['./migrations'],
+      // migrationsRun: true,
+      // migrationsTableName: 'JJ_migration',
     }),
     CacheModule.register({
       store: redisStore,

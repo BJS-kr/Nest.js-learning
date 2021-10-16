@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity({ database: 'db' })
+@Entity({ database: 'db', name: 'movies' })
 export class Movie {
   @PrimaryGeneratedColumn()
   id: number;

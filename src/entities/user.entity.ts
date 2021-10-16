@@ -8,16 +8,16 @@ import {
 } from 'typeorm';
 import { Movie } from './movie.entity';
 
-@Entity()
+@Entity({ database: 'db', name: 'users' })
 @Unique(['userId'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column('varchar', { length: 20, nullable: false })
   userId: string;
-  @Column()
+  @Column('varchar', { length: 100, nullable: false })
   hashedPassword: string;
-  @Column()
+  @Column('varchar', { length: 50, nullable: false })
   salt: string;
   @OneToMany(() => Movie, (movie) => movie.user, {
     cascade: ['update', 'remove'],
@@ -26,7 +26,6 @@ export class User {
     createForeignKeyConstraints: true,
   })
   movies: Movie[];
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'date' })
   registeredAt: Date;
 }
-// cascade 추가하기
