@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Connection, QueryRunner } from 'typeorm';
 import { CreateUserDto } from './dto/user.dto';
 import { hash, genSalt, compare } from 'bcryptjs';
@@ -6,6 +6,7 @@ import { SignInDto } from './dto/signIn.dto';
 import { User } from 'src/entities/user.entity';
 import { sign } from 'jsonwebtoken';
 import { transaction } from 'src/functions/transaction';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService {
@@ -26,10 +27,12 @@ export class UserService {
       salt,
     });
     const QR: QueryRunner = this.connection.createQueryRunner();
-    await transaction(QR, [() => QR.manager.save(user_)]);
+    if (!(await transaction(QR, [() => QR.manager.save(user_)])))
+      throw new HttpException('이미 가입된 아이디입니다', 409);
+    return '가입완료';
   }
 
-  async signIn(user: SignInDto) {
+  async signIn(user: SignInDto, res: Response) {
     const { userId, password } = user;
     const QR: QueryRunner = this.connection.createQueryRunner();
     const signInUser: User = (
@@ -37,9 +40,20 @@ export class UserService {
         () => QR.manager.findOne(User, { where: { userId } }),
       ])
     )[0];
-    if (!signInUser) return HttpStatus.CONFLICT;
+    // res에 return을 붙이면 TypeError: Converting circular structure to JSON 발생
+    if (!signInUser)
+      throw new HttpException('유저를 찾을 수 없습니다', HttpStatus.CONFLICT);
     else if (!(await compare(password, signInUser.hashedPassword)))
-      return HttpStatus.BAD_REQUEST;
-    return sign({ id: signInUser.id }, 'test', { expiresIn: 9999999 });
+      throw new HttpException(
+        '아이디 혹은 비밀번호가 일치하지 않습니다',
+        HttpStatus.BAD_REQUEST,
+      );
+    else
+      res
+        .cookie(
+          'accessToken',
+          sign({ id: signInUser.id }, 'test', { expiresIn: 9999999 }),
+        )
+        .send('로그인 성공!');
   }
 }

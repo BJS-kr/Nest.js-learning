@@ -1,9 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Res,
@@ -15,7 +15,6 @@ import {
 import { MovieInterceptor } from 'src/interceptors/movie.interceptor';
 import { MovieGuard } from 'src/guards/movie.guard';
 import { MovieService } from './movie.service';
-import { ErrorInterceptor } from 'src/interceptors/error.interceptor';
 import { CreateMovieDto } from './dto/movie.dto';
 import { MovieCacheInterceptor } from 'src/interceptors/cache.interceptor';
 import { Response } from 'express';
@@ -54,13 +53,20 @@ export class MovieController {
   patchMovie(@Param('movieId') movieId: string, @Body() movie: UpdateMovieDto) {
     return this.movieService.patchMovie(movieId, movie);
   }
-
+  // 영화 삭제
+  @Delete(':movieId')
+  deleteMoive(@Param('movieId') movieId: string) {
+    return this.movieService.deleteMovie(movieId);
+  }
   // 좋아요
   @Get('like/:movieId')
   like(@Param('movieId') movieId: string) {
     return this.movieService.like(movieId);
   }
   // 내가 올린 영화들만 가져오기
-  @Get('myMovie')
-  myMovie() {}
+  @Get('my/movies')
+  // passthrough 옵션을 안넣으면 res.method가 없기 때문에 요청이 돌아오지 않음.
+  async myMovie(@Res({ passthrough: true }) res: Response) {
+    return await this.movieService.myMovie(res.locals.user);
+  }
 }

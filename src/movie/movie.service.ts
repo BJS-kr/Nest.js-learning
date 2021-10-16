@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, getConnection, QueryRunner } from 'typeorm';
 import { Movie } from '../entities/movie.entity';
@@ -34,25 +34,29 @@ export class MovieService {
       ])
     )[0];
     console.log(movie);
-    if (!movie) return HttpStatus.CONFLICT;
-    await this.redis.sadd('movies', movieId);
-    await this.redis.hset(
-      movieId,
-      'createdAt',
-      movie.createdAt.toISOString(),
-      'updatedAt',
-      movie.updatedAt.toISOString(),
-      'title',
-      movie.title,
-      'desc',
-      movie.desc,
-      'name',
-      movie.name.join(', '),
-      'id',
-      movie.id,
-      'like',
-      movie.like,
-    );
+    if (!movie)
+      throw new HttpException('Cannot Find Movie!!!', HttpStatus.CONFLICT);
+    await this.redis
+      .pipeline()
+      .sadd('movies', movieId)
+      .hset(
+        movieId,
+        'createdAt',
+        movie.createdAt.toISOString(),
+        'updatedAt',
+        movie.updatedAt.toISOString(),
+        'title',
+        movie.title,
+        'desc',
+        movie.desc,
+        'name',
+        movie.name.join(', '),
+        'id',
+        movie.id,
+        'like',
+        movie.like,
+      )
+      .exec();
     return movie;
   }
   async patchMovie(movieId: string, movie: UpdateMovieDto) {
@@ -69,6 +73,13 @@ export class MovieService {
     }
   }
 
+  async deleteMovie(movieId: string) {
+    const QR: QueryRunner = this.connection.createQueryRunner();
+
+    await transaction(QR, [() => QR.manager.softDelete(Movie, movieId)]);
+    await this.redis.pipeline().srem('movies', movieId).unlink(movieId).exec();
+  }
+
   async like(movieId: string) {
     const QR: QueryRunner = this.connection.createQueryRunner();
     await transaction(QR, [
@@ -80,5 +91,17 @@ export class MovieService {
         'like',
         parseInt(await this.redis.hget(movieId, 'like')) + 1,
       );
+  }
+  async myMovie(user: string): Promise<Movie[]> {
+    const QR: QueryRunner = this.connection.createQueryRunner();
+    return await transaction(QR, [
+      () =>
+        QR.manager
+          .createQueryBuilder(Movie, 'movies')
+          .select(['movies', 'user.id', 'user.userId', 'user.registeredAt'])
+          .innerJoin('movies.user', 'user')
+          .where('movies.user = :user', { user })
+          .getMany(),
+    ]);
   }
 }
