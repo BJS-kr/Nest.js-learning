@@ -22,10 +22,13 @@ export class MovieCacheInterceptor implements NestInterceptor {
     const ctx = context.switchToHttp();
     const req = ctx.getRequest<Request>();
     const { movieId } = req.params;
-    if (this.redis.sismember('movies', movieId)) {
-      const result = of(this.redis.hgetall(movieId));
+    const isCached = await this.redis.sismember('movies', movieId);
+    console.log(isCached);
+    if (isCached) {
+      console.log(typeof movieId);
+      const result = await this.redis.hgetall(movieId);
       console.log(`캐쉬를 반환합니다. 캐쉬의 content:`, result);
-      return result;
+      return of(result);
     } else console.log('Cache를 찾지 못했습니다. DB에서 데이터를 찾습니다.');
 
     return next.handle();

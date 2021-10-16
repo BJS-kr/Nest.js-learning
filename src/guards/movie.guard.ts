@@ -11,7 +11,7 @@ export class MovieGuard implements CanActivate {
     const req = ctx.getRequest<Request>();
     const res = ctx.getResponse<Response>();
     try {
-      res.locals.id = verify(req.cookies.accessToken, 'test')['id'];
+      res.locals.user = verify(req.cookies.accessToken, 'test')['id'];
       return true;
     } catch (e) {
       return false;

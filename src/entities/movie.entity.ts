@@ -12,7 +12,7 @@ import { User } from './user.entity';
 
 @Entity({ database: 'db', name: 'movies' })
 export class Movie {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
   @Column('varchar', { length: 40, unique: true })
   title: string;

@@ -37,13 +37,13 @@ export class MovieSubscriber implements EntitySubscriberInterface<Movie> {
   }
 
   beforeTransactionStart(event: TransactionStartEvent) {
-    console.log('Transaction을 시도합니다...' + event);
+    console.log('Transaction을 시도합니다...');
   }
 
   afterTransactionCommit(event: TransactionCommitEvent) {
-    console.log(`Transaction이 Commit되었습니다...`, event);
+    console.log(`Transaction이 Commit되었습니다...`); //event도 출력하면 너무 길다.
   }
   afterTransactionRollback(event: TransactionRollbackEvent) {
-    console.log(`Transaction이 완료되지 못해 rollback되었습니다.`, event);
+    console.log(`Transaction이 완료되지 못해 rollback되었습니다.`);
   }
 }

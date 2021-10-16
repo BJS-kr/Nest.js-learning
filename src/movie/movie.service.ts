@@ -18,37 +18,36 @@ export class MovieService {
     private connection: Connection,
   ) {}
 
-  async addMovie(movie: CreateMovieDto, id: Record<string, number>) {
-    const movie_: Movie = Object.assign(new Movie(), movie, id);
+  async addMovie(movie: CreateMovieDto, user: Record<string, number>) {
+    const movie_: Movie = Object.assign(new Movie(), movie, user);
     const QR: QueryRunner = this.connection.createQueryRunner();
     return await transaction(QR, [
       // transaction 동안 처리하고 싶은 내용들을 익명함수로 넣으면 됨
       () => QR.manager.save(movie_),
     ]);
   }
-  async getOne(movieId: number) {
+  async getOne(movieId: string) {
     const QR: QueryRunner = this.connection.createQueryRunner();
     const movie: Movie = (
       await transaction(QR, [
-        () => QR.manager.findOne(Movie, { where: { movieId } }),
+        () => QR.manager.findOne(Movie, { where: { id: movieId } }),
       ])
     )[0];
+    console.log(movie);
     if (!movie) return HttpStatus.CONFLICT;
     await this.redis.sadd('movies', movieId);
     await this.redis.hset(
-      movieId + '',
+      movieId,
       'createdAt',
-      movie.createdAt + '',
+      movie.createdAt.toISOString(),
       'updatedAt',
-      movie.updatedAt + '',
+      movie.updatedAt.toISOString(),
       'title',
       movie.title,
       'desc',
       movie.desc,
       'name',
-      movie.name,
-      'user',
-      movie.user + '',
+      movie.name.join(', '),
       'id',
       movie.id,
       'like',
@@ -56,39 +55,30 @@ export class MovieService {
     );
     return movie;
   }
-  async patchMovie(movieId: number, movie: UpdateMovieDto) {
+  async patchMovie(movieId: string, movie: UpdateMovieDto) {
     const QR: QueryRunner = this.connection.createQueryRunner();
     const updateMovie = Object.assign(new UpdateMovieDto(), movie);
     await transaction(QR, [
       () => QR.manager.update(Movie, { id: movieId }, updateMovie),
     ]);
     // 캐쉬가 존재 한다면
-    if (this.redis.sismember('movies', movieId + '')) {
-      if (movie.desc) await this.redis.hset(movieId + '', 'desc', movie.desc);
-      if (movie.name) await this.redis.hset(movieId + '', 'name', movie.name);
+    if (this.redis.sismember('movies', movieId)) {
+      if (movie.desc) await this.redis.hset(movieId, 'desc', movie.desc);
+      if (movie.name)
+        await this.redis.hset(movieId, 'name', movie.name.join(', '));
     }
   }
 
-  async like(movieId) {
+  async like(movieId: string) {
     const QR: QueryRunner = this.connection.createQueryRunner();
     await transaction(QR, [
-      () =>
-        QR.manager
-          .createQueryBuilder(Movie, 'movie')
-          .update(Movie)
-          .set({ like: () => 'like + 1' })
-          .where('movie.id=:id', { id: movieId })
-          .execute(),
+      () => QR.manager.increment(Movie, { id: '90' }, 'like', 1),
     ]);
-    if (await this.redis.sismember('movies', movieId + ''))
+    if (await this.redis.sismember('movies', movieId))
       await this.redis.hset(
-        movieId + '',
+        movieId,
         'like',
-        parseInt(await this.redis.hget(movieId + '', 'like')) + 1,
+        parseInt(await this.redis.hget(movieId, 'like')) + 1,
       );
-    return await this.redis.hset('movies', 'INCR', 1, '변정섭 일대기');
-  }
-  async getLike() {
-    return await this.redis.zrange('movies', 0, 0, 'WITHSCORES');
   }
 }

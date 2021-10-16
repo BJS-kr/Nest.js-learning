@@ -38,7 +38,7 @@ export class MovieController {
   @Post()
   addMovie(@Body() body: CreateMovieDto, @Res() res: Response) {
     res.send({
-      result: this.movieService.addMovie(body, { id: res.locals.id }),
+      result: this.movieService.addMovie(body, { user: res.locals.user }),
     });
   }
   // 영화 한개 정보
@@ -46,21 +46,21 @@ export class MovieController {
   @UseInterceptors(MovieCacheInterceptor)
   // every path parameter and query parameter comes over the network as a string by default (nestjs validation)
   // 그래서 ParseStringPipe는 없다. string을 변환하는 pipe밖에 없음
-  getOne(@Param('movieId', ParseIntPipe) movieId: number) {
+  getOne(@Param('movieId') movieId: string) {
     return this.movieService.getOne(movieId);
   }
   // 영화 수정
   @Patch(':movieId')
-  patchMovie(
-    @Param('movieId', ParseIntPipe) movieId: number,
-    @Body() movie: UpdateMovieDto,
-  ) {
+  patchMovie(@Param('movieId') movieId: string, @Body() movie: UpdateMovieDto) {
     return this.movieService.patchMovie(movieId, movie);
   }
 
   // 좋아요
   @Get('like/:movieId')
-  like(@Param('movieId', ParseIntPipe) movieId: number) {
+  like(@Param('movieId') movieId: string) {
     return this.movieService.like(movieId);
   }
+  // 내가 올린 영화들만 가져오기
+  @Get('myMovie')
+  myMovie() {}
 }

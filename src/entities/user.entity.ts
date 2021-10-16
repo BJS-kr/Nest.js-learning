@@ -11,7 +11,7 @@ import { Movie } from './movie.entity';
 @Entity({ database: 'db', name: 'users' })
 @Unique(['userId'])
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
   @Column('varchar', { length: 20, nullable: false })
   userId: string;
