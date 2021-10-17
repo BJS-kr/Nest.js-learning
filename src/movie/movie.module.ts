@@ -9,7 +9,14 @@ import { MovieSubscriber } from 'src/subscribers/movie.subscriber';
   imports: [TypeOrmModule.forFeature([Movie])],
   providers: [
     MovieService,
-    { provide: 'REDIS', useValue: new Redis({ host: 'redis' }) },
+    {
+      provide: 'REDIS',
+      useValue: new Redis({
+        host: 'redis',
+        port: 6379,
+        showFriendlyErrorStack: true,
+      }),
+    },
     MovieSubscriber,
   ],
   controllers: [MovieController],
