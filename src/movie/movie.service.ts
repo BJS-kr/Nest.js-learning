@@ -74,11 +74,12 @@ export class MovieService {
     ]);
     // hset은 key가 존재하지 않을 경우 key 생성, field가 존재하지 않을경우 field생성하기 때문에 데이터 무결성을 유지하려면 먼저 캐시가 존재하는지 검증해야한다.
     if (await this.redis.sismember('movies', movieId)) {
-      await this.redis.hset(
-        movieId,
-        'updatedAt',
-        result[1].updatedAt.toISOString(),
-      );
+      if (desc || name)
+        await this.redis.hset(
+          movieId,
+          'updatedAt',
+          result[1].updatedAt.toISOString(),
+        );
       if (desc) await this.redis.hset(movieId, 'desc', desc);
       if (name) await this.redis.hset(movieId, 'name', name.join(', '));
     }
