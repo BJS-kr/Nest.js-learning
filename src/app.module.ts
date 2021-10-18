@@ -11,6 +11,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { MoviesTable } from './migrations/movies.table';
 import { UsersTable } from './migrations/users.table';
+import { GoogleStrategy } from './passport/google.strategy';
+import { Social } from './entities/social.entity';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { UsersTable } from './migrations/users.table';
       username: 'user',
       password: 'password',
       database: 'db',
-      entities: [Movie, User],
+      entities: [Movie, User, Social],
       retryAttempts: 3,
       retryDelay: 3000,
       autoLoadEntities: false,
@@ -49,6 +51,7 @@ import { UsersTable } from './migrations/users.table';
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
+    GoogleStrategy,
   ],
 })
 export class AppModule {}

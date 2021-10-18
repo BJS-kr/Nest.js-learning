@@ -23,7 +23,7 @@ export class MovieCacheInterceptor implements NestInterceptor {
     const req = ctx.getRequest<Request>();
     const { movieId } = req.params;
     const isCached = await this.redis.sismember('movies', movieId);
-    console.log(isCached);
+    console.log('isCached? ', isCached);
     if (isCached) {
       console.log(typeof movieId);
       const result = await this.redis.hgetall(movieId);

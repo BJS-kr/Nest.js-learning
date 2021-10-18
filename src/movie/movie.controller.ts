@@ -36,8 +36,12 @@ export class MovieController {
   // 영화 등록
   @Post()
   addMovie(@Body() body: CreateMovieDto, @Res() res: Response) {
+    // check if the res.local.user is a numeric string
+    const user = isNaN(res.locals.user)
+      ? { socialUser: res.locals.user }
+      : { localUser: res.locals.user };
     res.send({
-      result: this.movieService.addMovie(body, { user: res.locals.user }),
+      result: this.movieService.addMovie(body, user),
     });
   }
   // 영화 한개 정보
