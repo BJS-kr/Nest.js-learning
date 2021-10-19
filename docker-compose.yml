@@ -18,6 +18,8 @@ services:
     hostname: redis_test
     environment:
       TZ: Asia/Seoul
+    volumes:
+      - ./redis_data:/data
   app:
     build: .
     depends_on: 

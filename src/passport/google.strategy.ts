@@ -21,12 +21,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const { name, emails, photos } = profile;
+    const { name, emails, photos, provider } = profile;
+    // console.log('구글 프로필 전체정보:', profile);
     const user = {
       email: emails[0].value,
       firstName: name.givenName,
       lastName: name.familyName,
       photo: photos[0].value,
+      provider,
       // accessToken,
       // refreshToken, // refreshToken은 googleapi로 받아야할듯
       // 직접 jwt를 발급할땐 google에서 발급한 token들은 필요없다.

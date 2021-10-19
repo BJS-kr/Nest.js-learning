@@ -88,7 +88,6 @@ export class MovieService {
 
   async deleteMovie(movieId: string): Promise<void> {
     const QR: QueryRunner = this.connection.createQueryRunner();
-
     await transaction(QR, [() => QR.manager.softDelete(Movie, movieId)]);
     await this.redis.multi().srem('movies', movieId).unlink(movieId).exec();
   }

@@ -6,7 +6,7 @@ import { SignInDto } from './dto/signIn.dto';
 import { User } from 'src/entities/user.entity';
 import { sign } from 'jsonwebtoken';
 import { transaction } from 'src/functions/transaction';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class UserService {
@@ -15,8 +15,7 @@ export class UserService {
   // 그 이유는 connection을 dependency를 initialize할 때 (앱 구동될때) 한번 connect되는데
   // 그걸 queryRunner.release()시켜버리니 연결이 영영 끊어져버리는 것이다.
   // 즉, 의도한대로 잘 동작하게 하려면 메 소드 내에 QR을 정의해서 사용해야 한다. 그때 그때 다시 연결되도록
-  async signUp(user: CreateUserDto) {
-    if (user.password !== user.rePassword) return '비밀번호 확인 불일치';
+  async signUp(user: CreateUserDto): Promise<void | '가입완료'> {
     const rounds = 10;
     const password = user.password;
     const hashedPassword = await hash(password, rounds);
@@ -50,6 +49,7 @@ export class UserService {
       );
     else
       res
+        .status(201)
         .cookie(
           'accessToken',
           sign({ id: signInUser.id }, 'test', { expiresIn: 9999999 }),

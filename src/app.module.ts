@@ -2,15 +2,13 @@ import { CacheModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Movie } from 'src/entities/movie.entity';
-import { MovieModule } from 'src/movie/movie.module';
+import { Movie } from './entities/movie.entity';
+import { MovieModule } from './movie/movie.module';
 import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-redis-store';
 import { User } from './entities/user.entity';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
-import { MoviesTable } from './migrations/movies.table';
-import { UsersTable } from './migrations/users.table';
 import { GoogleStrategy } from './passport/google.strategy';
 import { Social } from './entities/social.entity';
 

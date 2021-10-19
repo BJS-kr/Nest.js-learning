@@ -3,7 +3,7 @@ import { QueryRunner } from 'typeorm';
 export async function transaction(
   QR: QueryRunner,
   anonymousReturnsQueryRunnerMethod: any[],
-) {
+): Promise<any[]> {
   const result = [];
   await QR.connect();
   await QR.startTransaction();

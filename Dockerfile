@@ -1,13 +1,14 @@
-FROM node:latest AS JJ
+FROM node:14.18.1 AS JJ
 
 WORKDIR /src/app
 
 COPY . .
 
+RUN npm install npm@7.5.6
 RUN npm install
 RUN npm run build
 
-FROM node:latest
+FROM node:14.18.1
 WORKDIR /src/app
 COPY --from=JJ /src/app ./
 
