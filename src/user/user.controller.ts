@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   Post,
-  Req,
   Res,
   UseInterceptors,
   UsePipes,
@@ -14,7 +13,7 @@ import { SignInDto, signInSchema } from './dto/signIn.dto';
 import { CreateUserDto, registerSchema } from './dto/user.dto';
 import { UserService } from './user.service';
 import { JoiValidationPipe } from 'src/pipes/user.validation.pipe';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
   ApiTags,
   ApiCreatedResponse,

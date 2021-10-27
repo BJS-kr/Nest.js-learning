@@ -15,3 +15,10 @@ export const GoogleUser = createParamDecorator(
     return req.user;
   },
 );
+
+export const FacebookUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const req = ctx.switchToHttp().getRequest<Request>();
+    return req.user;
+  },
+);

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -85,6 +86,7 @@ export class MovieController {
   }
   // 좋아요
   @Get('like/:movieId')
+  @HttpCode(204)
   @ApiOperation({ description: 'incrementally up like count' })
   @ApiNoContentResponse()
   @ApiParam({ description: 'movie id', required: true, name: 'movieId' })

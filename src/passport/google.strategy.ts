@@ -24,7 +24,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const { name, emails, photos, provider } = profile;
     // console.log('구글 프로필 전체정보:', profile);
     const user = {
-      email: emails[0].value,
+      id: emails[0].value,
       firstName: name.givenName,
       lastName: name.familyName,
       photo: photos[0].value,

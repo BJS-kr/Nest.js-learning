@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import { GoogleStrategy } from './passport/google.strategy';
+import { FacebookStrategy } from './passport/facebook.strategy';
 import { Social } from './entities/social.entity';
 
 @Module({
@@ -50,6 +51,7 @@ import { Social } from './entities/social.entity';
     AppService,
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
     GoogleStrategy,
+    FacebookStrategy,
   ],
 })
 export class AppModule {}

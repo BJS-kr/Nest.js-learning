@@ -21,6 +21,7 @@ export class RedirectInterceptor implements NestInterceptor {
       console.log('token found... redirecting...');
       return of(res.redirect(this.target));
     }
+    return next.handle();
   }
 }
 

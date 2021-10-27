@@ -2,14 +2,14 @@ import { QueryRunner } from 'typeorm';
 
 export async function transaction(
   QR: QueryRunner,
-  anonymousReturnsQueryRunnerMethod: any[],
+  anonymousReturnsQuery: any[],
 ): Promise<any[]> {
   const result = [];
   await QR.connect();
   await QR.startTransaction();
   try {
-    for (let i = 0; i < anonymousReturnsQueryRunnerMethod.length; i++) {
-      result.push(await anonymousReturnsQueryRunnerMethod[i]());
+    for (let i = 0; i < anonymousReturnsQuery.length; i++) {
+      result.push(await anonymousReturnsQuery[i]());
     }
     await QR.commitTransaction();
     return result;

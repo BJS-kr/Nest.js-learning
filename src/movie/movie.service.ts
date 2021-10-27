@@ -72,6 +72,7 @@ export class MovieService {
       () => QR.manager.update(Movie, { id: movieId }, updateMovie),
       () => QR.manager.findOne(Movie, movieId),
     ]);
+    console.log(result);
     // hset은 key가 존재하지 않을 경우 key 생성, field가 존재하지 않을경우 field생성하기 때문에 데이터 무결성을 유지하려면 먼저 캐시가 존재하는지 검증해야한다.
     if (await this.redis.sismember('movies', movieId)) {
       if (desc || name)

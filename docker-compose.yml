@@ -1,6 +1,13 @@
 version: '3.9'
 
 services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    environment:
+    ports:
+     - "80:80"
+     - "444:444"
   postgres:
     image: postgres
     environment:
@@ -25,8 +32,11 @@ services:
     depends_on: 
       - postgres
       - redis
-    ports:
-      - '3000:3000'
+    expose:
+      - "3000"
+    # nginx프록시를 통과하기 때문에 더 이상 호스트 포트로 노출 시킬 필요 없음
+    # ports:
+    #   - '3000:3000'
     volumes:
       - '.:/src/app'
       - '/c/Users/BJS/Desktop/projects/js-s-nestjs/node_modules'

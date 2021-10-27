@@ -12,6 +12,7 @@ import {
 import { Social } from './entities/social.entity';
 import { RedirectOrTokenInterceptor } from './interceptors/redirect.interceptor';
 import { GoogleUser } from './decorators/decorators';
+import { FacebookUser } from './decorators/decorators';
 
 @ApiTags('app')
 @Controller()
@@ -42,5 +43,16 @@ export class AppController {
   @UseGuards(AuthGuard('google'))
   async googleOauthRedirect(@GoogleUser() user) {
     return await this.appService.googleLogin(user);
+  }
+
+  @Get('social/facebook')
+  @UseGuards(AuthGuard('facebook'))
+  async facebookAuth() {}
+
+  @Get('facebook/auth/callback')
+  @UseInterceptors(new RedirectOrTokenInterceptor('/'))
+  @UseGuards(AuthGuard('facebook'))
+  async facebookAuthRedirect(@FacebookUser() user) {
+    return await this.appService.facebookLogin(user);
   }
 }
