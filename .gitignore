@@ -1,0 +1,4 @@
+node_modules
+pgdata
+redis_data
+.env

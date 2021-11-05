@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+     - "80:80"
+     - "444:444"
+    volumes:
+      - /c/Users/BJS/Desktop/projects/js-s-nestjs/nginx/conf.d/:/etc/nginx/conf.d/
+      - /c/Users/BJS/Desktop/projects/js-s-nestjs/nginx/nginx.conf:/etc/nginx/nginx.conf
+    command: ['nginx', '-g', 'daemon off;'] # daemon off 안붙이면 docker compose -d 옵션으로 실행했을때 오류남
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: db
+      TZ: Asia/Seoul
+    env_file:
+      - .env
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis
+    container_name: redis
+    command: redis-server --port 6379
+    hostname: redis_test
+    environment:
+      TZ: Asia/Seoul
+    volumes:
+      - ./redis_data:/data
+  app:
+    build: .
+    container_name: app
+    depends_on: 
+      - postgres
+      - redis
+      - nginx
+    expose:
+      - "3000"
+    # nginx프록시를 통과하기 때문에 더 이상 호스트 포트로 노출 시킬 필요 없음
+    # ports:
+    #   - '3000:3000'
+    volumes:
+      - '.:/src/app'
+      - '/c/Users/BJS/Desktop/projects/js-s-nestjs/node_modules'
+    

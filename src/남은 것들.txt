@@ -1,0 +1,3 @@
+1.nginx(reverse proxy 및 443으로 들어온다고 가정하고 3000으로 리디렉트)
+2.googleapi를 활용한 youtube영상업로드
+3.ffmpeg 영상처리 서버 추가 구동(youtube업로드로 연동)
